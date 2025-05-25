@@ -1,0 +1,39 @@
+---INDEXAÇÃO E OTIMIZAÇÃO---
+
+---1: Criação dos Índices---
+---1 SIMPLES(Usuarios.email)---
+CREATE INDEX idx_email_usuarios ON Usuarios(email);
+---2 SIMPLES(Livros.isbn)---
+CREATE INDEX idx_isbn_livros ON Livros(isbn);
+---3 COMPOSTO(Emprestimos (usuario_id, livro_id))
+CREATE INDEX idx_usuario_livro_emprestimo ON Emprestimos(usuario_id, livro_id);
+
+---2: Comparar Performance com EXPLAIN ANALYZE---
+---SEM ÍNDICE---
+EXPLAIN ANALYZE
+SELECT * FROM Usuarios WHERE email = 'joao@universidade.edu';
+---COM ÍNDICE---
+EXPLAIN ANALYZE
+SELECT * FROM Usuarios WHERE email = 'joao@universidade.edu';
+
+
+---MELHORIAS---
+---Buscar empréstimos por status---
+CREATE INDEX idx_emprestimos_status ON Emprestimos(status);
+EXPLAIN ANALYZE
+SELECT * FROM Emprestimos WHERE status = 'ativo';
+
+
+---Buscar por data de devolução---
+CREATE INDEX idx_emprestimos_devolucao_prevista ON Emprestimos(data_devolucao_prevista);
+EXPLAIN ANALYZE
+SELECT * FROM Emprestimos
+WHERE data_devolucao_prevista < CURRENT_DATE
+  AND data_devolucao_real IS NULL;
+
+
+---Reservas por status (usado em várias consultas)---
+CREATE INDEX idx_reservas_status ON Reservas(status);
+EXPLAIN ANALYZE
+SELECT * FROM Reservas WHERE status = 'ativo';
+
